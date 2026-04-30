@@ -1643,6 +1643,30 @@ export type Database = {
           },
         ]
       }
+      school_requests: {
+        Row: {
+          created_at: string
+          id: string
+          requested_by: string
+          school_name: string
+          state: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          requested_by: string
+          school_name: string
+          state?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          requested_by?: string
+          school_name?: string
+          state?: string | null
+        }
+        Relationships: []
+      }
       school_students: {
         Row: {
           admission_date: string

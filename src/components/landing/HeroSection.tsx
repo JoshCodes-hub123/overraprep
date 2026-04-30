@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, GraduationCap, School, BookOpen, Sparkles, ShieldCheck } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import heroEditorial from "@/assets/hero-editorial.jpg";
+import heroEditorial from "@/assets/hero-student-reading.jpg";
 import heroCollab from "@/assets/hero-collab.jpg";
 import heroStudyDetail from "@/assets/hero-study-detail.jpg";
 
@@ -20,8 +20,8 @@ const heroSlides = [
     src: heroEditorial,
     // Subject is right side → push focal right on mobile, center on desktop
     focal: "object-[78%_30%] sm:object-[72%_30%] md:object-[65%_35%] lg:object-[60%_35%]",
-    highlight: "Practice.",
-    sub: "AI-graded CBT drills, instant explanations, real exam pacing.",
+    highlight: "Ease.",
+    sub: "AI explanations, past questions and personal study plans — built for university students.",
   },
   {
     src: heroCollab,

@@ -77,6 +77,9 @@ const MyReportCard = lazy(() => import("@/pages/student/MyReportCard"));
 const Terms = lazy(() => import("@/pages/legal/Terms"));
 const Privacy = lazy(() => import("@/pages/legal/Privacy"));
 const PrivacySettings = lazy(() => import("@/pages/settings/PrivacySettings"));
+const StudentOnboarding = lazy(() => import("@/pages/onboarding/StudentOnboarding"));
+const TutorPending = lazy(() => import("@/pages/auth/TutorPending"));
+const Upgrade = lazy(() => import("@/pages/Upgrade"));
 
 export const AnimatedRoutes = () => {
   const location = useLocation();
@@ -86,7 +89,7 @@ export const AnimatedRoutes = () => {
       <Suspense fallback={<LoadingSpinner />} key={location.pathname}>
        <AcademicPathGate>
         <Routes location={location}>
-          <Route path="/" element={<PageTransition><Welcome /></PageTransition>} />
+          <Route path="/" element={<PageTransition>{FEATURES.marketingSite ? <Index /> : <Welcome />}</PageTransition>} />
           <Route path="/website" element={<PageTransition><Index /></PageTransition>} />
           <Route
             path="/auth"
@@ -256,6 +259,9 @@ export const AnimatedRoutes = () => {
           <Route path="/onboarding/path" element={<PageTransition><ChoosePath /></PageTransition>} />
           <Route path="/onboarding/refine" element={<PageTransition><RefinePath /></PageTransition>} />
           <Route path="/onboarding/match" element={<PageTransition><TutorMatching /></PageTransition>} />
+          <Route path="/onboarding/student" element={<PageTransition><StudentOnboarding /></PageTransition>} />
+          <Route path="/auth/tutor-pending" element={<PageTransition><TutorPending /></PageTransition>} />
+          <Route path="/upgrade" element={<PageTransition><Upgrade /></PageTransition>} />
           <Route path="/subjects" element={<PageTransition><SubjectBrowser /></PageTransition>} />
           <Route path="/flashcards" element={<PageTransition><Flashcards /></PageTransition>} />
           <Route

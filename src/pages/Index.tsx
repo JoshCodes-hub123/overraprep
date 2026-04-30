@@ -9,6 +9,7 @@ import FeaturedTutorsSection from "@/components/landing/FeaturedTutorsSection";
 import TestimonialsSection from "@/components/landing/TestimonialsSection";
 import FAQSection from "@/components/landing/FAQSection";
 import TutorSection from "@/components/landing/TutorSection";
+import AudienceSplit from "@/components/landing/AudienceSplit";
 import CTASection from "@/components/landing/CTASection";
 import Footer from "@/components/layout/Footer";
 import OnboardingTour from "@/components/onboarding/OnboardingTour";
@@ -51,6 +52,7 @@ const Index = () => {
         <main role="main" aria-label="Main content">
           <HeroSection />
           <TrustStrip />
+          <AudienceSplit />
           <StatsSection />
           <FeaturesSection />
           <HowItWorksSection />

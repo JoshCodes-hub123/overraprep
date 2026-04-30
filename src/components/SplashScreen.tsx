@@ -6,149 +6,130 @@ interface SplashScreenProps {
   onComplete: () => void;
 }
 
-const loadingSteps = [
-  "Warming up the AI tutor…",
-  "Loading your study plan…",
-  "Syncing past questions…",
-  "Almost there…",
-];
-
+/**
+ * Two-beat luxury splash:
+ *   Beat 1 — gold gradient background, logo scales in with glow halo.
+ *   Beat 2 — "Read with Ease" tagline slides DOWN from above the logo (Playfair).
+ *   Beat 3 — fade out, app appears.
+ *
+ * Respects prefers-reduced-motion.
+ */
 const SplashScreen = ({ onComplete }: SplashScreenProps) => {
-  const [stage, setStage] = useState<"logo" | "text" | "exit">("logo");
-  const [progress, setProgress] = useState(0);
-  const [stepIndex, setStepIndex] = useState(0);
+  const [showTagline, setShowTagline] = useState(false);
+  const [exiting, setExiting] = useState(false);
 
   useEffect(() => {
-    const logoTimer = setTimeout(() => setStage("text"), 700);
-    const textTimer = setTimeout(() => setStage("exit"), 2400);
-    const exitTimer = setTimeout(() => onComplete(), 2900);
+    const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    const taglineDelay = reduce ? 200 : 1100;
+    const exitDelay = reduce ? 900 : 2400;
+    const doneDelay = reduce ? 1200 : 2900;
 
-    // Simulated progress (eases to 100%)
-    const progressInterval = setInterval(() => {
-      setProgress((p) => {
-        if (p >= 100) return 100;
-        const remaining = 100 - p;
-        return Math.min(100, p + Math.max(1.5, remaining * 0.08));
-      });
-    }, 70);
-
-    // Rotating loading steps
-    const stepInterval = setInterval(() => {
-      setStepIndex((i) => (i + 1) % loadingSteps.length);
-    }, 650);
-
+    const t1 = setTimeout(() => setShowTagline(true), taglineDelay);
+    const t2 = setTimeout(() => setExiting(true), exitDelay);
+    const t3 = setTimeout(onComplete, doneDelay);
     return () => {
-      clearTimeout(logoTimer);
-      clearTimeout(textTimer);
-      clearTimeout(exitTimer);
-      clearInterval(progressInterval);
-      clearInterval(stepInterval);
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
     };
   }, [onComplete]);
 
   return (
     <AnimatePresence>
-      {stage !== "exit" && (
+      {!exiting && (
         <motion.div
-          className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-background"
+          className="fixed inset-0 z-[9999] flex flex-col items-center justify-center overflow-hidden"
           initial={{ opacity: 1 }}
           exit={{ opacity: 0, scale: 1.02 }}
           transition={{ duration: 0.5, ease: "easeInOut" }}
+          style={{
+            // Gold luxury gradient — warm gold to soft champagne
+            background:
+              "radial-gradient(ellipse at 50% 35%, hsl(45 90% 65%) 0%, hsl(43 75% 55%) 35%, hsl(40 60% 42%) 100%)",
+          }}
+          aria-label="OverraPrep is loading"
         >
-          {/* Animated gradient background */}
-          <div className="absolute inset-0 bg-gradient-hero overflow-hidden">
-            <motion.div
-              className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary/20 rounded-full blur-3xl"
-              animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
-              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-            />
-            <motion.div
-              className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-accent/15 rounded-full blur-3xl"
-              animate={{ scale: [1.2, 1, 1.2], opacity: [0.4, 0.2, 0.4] }}
-              transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
-            />
-          </div>
-
-          <div className="relative z-10 flex flex-col items-center px-8 w-full max-w-sm">
-            {/* Logo with glow */}
-            <motion.div
-              className="relative"
-              initial={{ scale: 0.6, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ type: "spring", stiffness: 200, damping: 18 }}
-            >
-              <motion.div
-                className="absolute inset-0 rounded-full bg-gradient-primary blur-xl"
-                animate={{ scale: [1, 1.3, 1], opacity: [0.5, 0.8, 0.5] }}
-                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                style={{ transform: "scale(1.5)" }}
+          {/* Drifting champagne particles */}
+          <div className="absolute inset-0 pointer-events-none">
+            {[...Array(14)].map((_, i) => (
+              <motion.span
+                key={i}
+                className="absolute rounded-full bg-white/40"
+                style={{
+                  width: 4 + (i % 4) * 2,
+                  height: 4 + (i % 4) * 2,
+                  left: `${(i * 73) % 100}%`,
+                  top: `${(i * 41) % 100}%`,
+                  filter: "blur(1px)",
+                }}
+                animate={{
+                  y: [0, -20, 0],
+                  opacity: [0.3, 0.7, 0.3],
+                }}
+                transition={{
+                  duration: 3 + (i % 3),
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: i * 0.2,
+                }}
               />
-              <div className="relative w-24 h-24 md:w-28 md:h-28 rounded-3xl bg-card shadow-2xl flex items-center justify-center overflow-hidden border-2 border-primary/30">
-                <motion.img
-                  src={logo}
-                  alt="OverraPrep AI"
-                  className="w-16 h-16 md:w-20 md:h-20 object-contain"
-                  animate={{ scale: [1, 1.06, 1] }}
-                  transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
-                />
-              </div>
-            </motion.div>
-
-            {/* Brand name */}
-            <motion.div
-              className="mt-7 flex flex-col items-center"
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.5 }}
-            >
-              <h1 className="font-display text-2xl md:text-3xl font-bold text-foreground tracking-tight">
-                Overra<span className="text-gradient-primary">Prep</span>
-              </h1>
-              <p className="text-muted-foreground mt-1 text-xs md:text-sm">
-                AI-Powered Exam Preparation
-              </p>
-            </motion.div>
-
-            {/* Realistic progress bar */}
-            <motion.div
-              className="w-full mt-8"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.4, duration: 0.4 }}
-            >
-              <div className="relative h-1.5 w-full bg-muted/40 rounded-full overflow-hidden">
-                <motion.div
-                  className="absolute inset-y-0 left-0 bg-gradient-to-r from-primary via-primary to-accent rounded-full"
-                  style={{ width: `${progress}%` }}
-                  transition={{ ease: "easeOut" }}
-                />
-                <motion.div
-                  className="absolute inset-y-0 w-12 bg-gradient-to-r from-transparent via-white/40 to-transparent"
-                  animate={{ x: ["-3rem", "20rem"] }}
-                  transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
-                />
-              </div>
-
-              {/* Rotating step + percent */}
-              <div className="flex items-center justify-between mt-2.5 text-[11px]">
-                <AnimatePresence mode="wait">
-                  <motion.span
-                    key={stepIndex}
-                    initial={{ opacity: 0, y: 4 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -4 }}
-                    transition={{ duration: 0.3 }}
-                    className="text-muted-foreground"
-                  >
-                    {loadingSteps[stepIndex]}
-                  </motion.span>
-                </AnimatePresence>
-                <span className="font-mono font-semibold text-primary tabular-nums">
-                  {Math.round(progress)}%
-                </span>
-              </div>
-            </motion.div>
+            ))}
           </div>
+
+          {/* Tagline — slides DOWN from above the logo */}
+          <div className="relative z-10 mb-6 h-12 flex items-end justify-center w-full px-6">
+            <AnimatePresence>
+              {showTagline && (
+                <motion.h2
+                  initial={{ opacity: 0, y: -40 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                  className="font-display italic text-2xl sm:text-3xl text-white tracking-wide drop-shadow-md"
+                  style={{ textShadow: "0 2px 12px rgba(120,80,0,0.35)" }}
+                >
+                  Read with Ease
+                </motion.h2>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* Logo with glow */}
+          <motion.div
+            className="relative z-10"
+            initial={{ scale: 0.55, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: "spring", stiffness: 180, damping: 16 }}
+          >
+            <motion.div
+              className="absolute inset-0 rounded-full bg-white/40 blur-2xl"
+              animate={{ scale: [1, 1.25, 1], opacity: [0.5, 0.85, 0.5] }}
+              transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
+              style={{ transform: "scale(1.5)" }}
+            />
+            <div className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-3xl bg-white shadow-2xl flex items-center justify-center overflow-hidden ring-4 ring-white/40">
+              <motion.img
+                src={logo}
+                alt="OverraPrep AI"
+                className="w-20 h-20 sm:w-24 sm:h-24 object-contain"
+                animate={{ scale: [1, 1.05, 1] }}
+                transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+              />
+            </div>
+          </motion.div>
+
+          {/* Brand name under logo */}
+          <motion.div
+            className="relative z-10 mt-6 text-center"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.5 }}
+          >
+            <h1 className="font-display text-2xl sm:text-3xl font-bold text-white tracking-tight">
+              OverraPrep
+            </h1>
+            <p className="text-white/85 mt-1 text-xs sm:text-sm">AI-Powered Exam Preparation</p>
+          </motion.div>
         </motion.div>
       )}
     </AnimatePresence>
