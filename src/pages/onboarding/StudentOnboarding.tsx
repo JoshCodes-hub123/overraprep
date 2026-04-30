@@ -185,11 +185,11 @@ const StudentOnboarding = () => {
     setSubmitting(true);
     try {
       // Save profile metadata
-      const academic_metadata: Record<string, unknown> = {
+      const academic_metadata = {
         school: selectedSchool?.name ?? null,
         school_id: selectedSchool?.id ?? null,
         level,
-      };
+      } as any;
       const { error: profileErr } = await supabase
         .from("profiles")
         .update({
